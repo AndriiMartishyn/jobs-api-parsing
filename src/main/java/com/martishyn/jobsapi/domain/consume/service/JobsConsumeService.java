@@ -1,7 +1,11 @@
 package com.martishyn.jobsapi.domain.consume.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+import java.util.List;
+
 public interface JobsConsumeService {
 
-    String fetchDataFromApi();
+    List<JsonNode> fetchDataFromApi();
 
 }
