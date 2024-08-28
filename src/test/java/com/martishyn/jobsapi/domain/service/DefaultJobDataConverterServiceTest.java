@@ -1,7 +1,7 @@
 package com.martishyn.jobsapi.domain.service;
 
 import com.martishyn.jobsapi.domain.dmo.JobDataDmo;
-import com.martishyn.jobsapi.domain.response.JobDataResponse;
+import com.martishyn.jobsapi.domain.dto.JobDataDto;
 import com.martishyn.jobsapi.domain.service.impl.DefaultJobDataConverterService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,18 +13,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DefaultJobDataConverterServiceTest {
+
     private static final String EMPTY_STRING = "";
-    private static JobDataResponse jobDataResponse1;
-    private static JobDataResponse jobDataResponse2;
+
+    private static JobDataDto jobDataResponse1;
+
+    private static JobDataDto jobDataResponse2;
+
     private static JobDataConverterService jobDataConverter;
-    private static List<JobDataResponse> jobDataResponseList;
+
+    private static List<JobDataDto> jobDataResponseList;
+
     private static final long EARLY_EPOCH_TIME = Instant.now().getEpochSecond() + 1;
+
     private static final long LATE_EPOCH_TIME = Instant.now().getEpochSecond() + 2;
 
     @BeforeAll
     static void init() {
         jobDataConverter = new DefaultJobDataConverterService();
-        jobDataResponse1 = new JobDataResponse();
+        jobDataResponse1 = new JobDataDto();
         jobDataResponse1.setSlugName("test-1");
         jobDataResponse1.setCompanyName("test-company");
         jobDataResponse1.setTitle("test-title");
@@ -35,7 +42,7 @@ public class DefaultJobDataConverterServiceTest {
         jobDataResponse1.setTags(List.of("Tag1", "Tag2"));
         jobDataResponse1.setLocation("test-location");
         jobDataResponse1.setCreatedAt(EARLY_EPOCH_TIME);
-        jobDataResponse2 = new JobDataResponse();
+        jobDataResponse2 = new JobDataDto();
         jobDataResponse2.setRemote(Boolean.TRUE);
         jobDataResponse2.setCreatedAt(LATE_EPOCH_TIME);
         jobDataResponseList = new ArrayList<>();
