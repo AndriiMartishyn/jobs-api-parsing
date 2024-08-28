@@ -16,5 +16,4 @@ public class ArbeitNowScheduledTaskProcessor {
     public void fetchNewData() {
         arbeitNowJsonProcessingService.processNewJobsData();
     }
-
 }

@@ -31,6 +31,7 @@ public class JobDataDmo {
     private String tags;
     private String jobTypes;
     private String location;
+    @OrderColumn
     private long createdAt;
 
     @Override

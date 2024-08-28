@@ -4,13 +4,11 @@ import com.martishyn.jobsapi.domain.client.ArbeitNowClient;
 import com.martishyn.jobsapi.domain.dmo.JobDataDmo;
 import com.martishyn.jobsapi.domain.repository.JobDataRepository;
 import com.martishyn.jobsapi.domain.response.JobDataResponse;
-import com.martishyn.jobsapi.domain.response.JobsApiResponse;
 import com.martishyn.jobsapi.domain.service.ArbeitNowJsonProcessingService;
 import com.martishyn.jobsapi.domain.service.JobDataConverterService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -29,21 +27,24 @@ public class DefaultArbeitNowJsonProcessingService implements ArbeitNowJsonProce
 
     @PostConstruct
     public void init() {
-        List<JobDataResponse> jobs = new ArrayList<>();
+        processInitialDataFetch();
+    }
+
+    @Override
+    public void processInitialDataFetch() {
+        List<JobDataResponse> fetchedJobsData = new ArrayList<>();
         for (int i = 1; i <= maxPageCount; i++) {
             List<JobDataResponse> jobDataResponses = arbeitNowClient.fetchApiData(i);
-            jobs.addAll(jobDataResponses);
+            fetchedJobsData.addAll(jobDataResponses);
         }
-        List<JobDataDmo> jobDmos = jobs.stream()
-                .map(jobDataConverterService::convertResponseDataToDmo)
-                .sorted(Comparator.comparingLong(JobDataDmo::getCreatedAt).reversed())
-                .collect(Collectors.toList());
-        lastUpdateTimeInEpoch = jobDmos.getFirst().getCreatedAt();
-        jobDataRepository.saveAll(jobDmos);
+        List<JobDataDmo> jobDataDmos = jobDataConverterService.convertResponseDataToDmoAndOrderByCreateDate(fetchedJobsData);
+        lastUpdateTimeInEpoch = jobDataDmos.getFirst().getCreatedAt();
+        jobDataRepository.saveAll(jobDataDmos);
     }
 
     @Override
     public void processNewJobsData() {
+        List<JobDataResponse> updatedJobDataResponse = new ArrayList<>();
         int pageCounter = 1;
         boolean hasMorePage = true;
         while (hasMorePage) {
@@ -51,8 +52,11 @@ public class DefaultArbeitNowJsonProcessingService implements ArbeitNowJsonProce
             List<JobDataResponse> updatedJobData = jobDataResponses.stream()
                     .filter(job -> job.getCreatedAt() > lastUpdateTimeInEpoch)
                     .toList();
+            updatedJobDataResponse.addAll(0, updatedJobData);
             if (!updatedJobData.isEmpty()) {
                 lastUpdateTimeInEpoch = updatedJobData.getFirst().getCreatedAt();
+                List<JobDataDmo> updatedJobDataDmo = jobDataConverterService.convertResponseDataToDmoAndOrderByCreateDate(updatedJobDataResponse);
+                jobDataRepository.saveAll( updatedJobDataDmo);
                 pageCounter++;
             } else {
                 hasMorePage = false;
