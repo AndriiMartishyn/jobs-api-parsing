@@ -22,7 +22,6 @@ public class DefaultArbeitNowJsonProcessingService implements ArbeitNowJsonProce
     private final JobDataConverterService jobDataConverterService;
 
     private final JobDataRepository jobDataRepository;
-
     @Value("${jobs.api.client.max.page.count}")
     private int maxPageCount;
 

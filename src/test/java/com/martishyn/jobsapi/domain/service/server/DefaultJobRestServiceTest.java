@@ -7,7 +7,6 @@ import com.martishyn.jobsapi.domain.repository.JobDataRepository;
 import com.martishyn.jobsapi.domain.service.converter.JobDataConverterService;
 import com.martishyn.jobsapi.domain.service.server.impl.DefaultJobsRestService;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,7 +49,7 @@ public class DefaultJobRestServiceTest {
 
     @DisplayName("find-paginated-and-sorted-returning-dto")
     @Test
-    void shouldReturnJobDtoConvertedFromDatabaseCallWhenFindingJobsPaginatedAndSorted(){
+    void shouldReturnJobDtoConvertedFromDatabaseCallWhenFindingJobsPaginatedAndSorted() {
         Page<JobDataDmo> page = new PageImpl<>(List.of(jobDataDmo));
         when(jobDataRepository.findAll(pageable)).thenReturn(page);
         when(jobDataConverterService.convertJobDmoToJobDto(jobDataDmo)).thenReturn(jobDataDto);
@@ -66,7 +65,7 @@ public class DefaultJobRestServiceTest {
 
     @DisplayName("find-most-recent-returning-dto")
     @Test
-    void shouldReturnJobDtoConvertedFromDatabaseCallWhenFindingMostRecentJobs(){
+    void shouldReturnJobDtoConvertedFromDatabaseCallWhenFindingMostRecentJobs() {
         when(jobDataRepository.findMostRecentJobs(pageable)).thenReturn(Collections.singletonList(jobDataDmo));
         when(jobDataConverterService.convertJobDmoToJobDto(jobDataDmo)).thenReturn(jobDataDto);
 

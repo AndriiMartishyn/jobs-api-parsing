@@ -38,7 +38,7 @@ public class DefaultJobDataConverterServiceTest {
         testJobDataDtoObject_1.setSlugName("test-1");
         testJobDataDtoObject_1.setCompanyName("test-company");
         testJobDataDtoObject_1.setTitle("test-title");
-        testJobDataDtoObject_1.setDescription("test - description");
+        testJobDataDtoObject_1.setDescription("test-description");
         testJobDataDtoObject_1.setRemote(Boolean.TRUE);
         testJobDataDtoObject_1.setUrl("test-url");
         testJobDataDtoObject_1.setJobTypes(List.of("Test1", "Test2"));
@@ -55,7 +55,7 @@ public class DefaultJobDataConverterServiceTest {
         testJobDataDmoObject.setSlugName("test-1");
         testJobDataDmoObject.setCompanyName("test-company");
         testJobDataDmoObject.setTitle("test-title");
-        testJobDataDmoObject.setDescription("test - description");
+        testJobDataDmoObject.setDescription("test-description");
         testJobDataDmoObject.setRemote("true");
         testJobDataDmoObject.setUrl("test-url");
         testJobDataDmoObject.setJobTypes("Test1, Test2");
@@ -105,9 +105,11 @@ public class DefaultJobDataConverterServiceTest {
         Assertions.assertEquals(EARLY_EPOCH_TIME, jobDataDmos.getLast().getCreatedAt());
     }
 
-    @DisplayName("convert-dto-obj-to-dmo")
+    @DisplayName("convert-dmo-obj-to-dto")
     @Test
     void shouldConvertResponseJobObjectToDmoObject_WhenValidInput() {
+        testJobDataDtoObject_1.setJobTypes(Collections.singletonList("Test1, Test2"));
+        testJobDataDtoObject_1.setTags(Collections.singletonList("Tag1, Tag2"));
         JobDataDto actualJobDataDto = jobDataConverter.convertJobDmoToJobDto(testJobDataDmoObject);
 
         Assertions.assertNotNull(actualJobDataDto);

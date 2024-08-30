@@ -4,10 +4,11 @@ import com.martishyn.jobsapi.domain.client.ArbeitNowClient;
 import com.martishyn.jobsapi.domain.dmo.JobDataDmo;
 import com.martishyn.jobsapi.domain.dto.JobDataDto;
 import com.martishyn.jobsapi.domain.repository.JobDataRepository;
-import com.martishyn.jobsapi.domain.service.converter.JobDataConverterService;
 import com.martishyn.jobsapi.domain.service.client.impl.DefaultArbeitNowJsonProcessingService;
+import com.martishyn.jobsapi.domain.service.converter.JobDataConverterService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -40,8 +41,7 @@ public class DefaultArbeitNowJsonProcessingServiceTest {
     @Mock
     private JobDataRepository jobDataRepository;
 
-    @Spy
-    private static List<JobDataDto> jobDataResponseList;
+    private List<JobDataDto> jobDataDtoList;
 
     @Mock
     private List<JobDataDmo> jobDataDmoList;
@@ -49,41 +49,39 @@ public class DefaultArbeitNowJsonProcessingServiceTest {
     @Mock
     private JobDataDmo jobDataDmo;
 
-    @BeforeAll
-    public static void setup() {
-        JobDataDto firstJobDataResponse = new JobDataDto();
-        JobDataDto secondJobDataResponse = new JobDataDto();
-        firstJobDataResponse.setCreatedAt(1L);
-        secondJobDataResponse.setCreatedAt(2L);
-        jobDataResponseList = new ArrayList<>();
-        jobDataResponseList.add(firstJobDataResponse);
-        jobDataResponseList.add(secondJobDataResponse);
-
+    @BeforeEach
+    public void setup() {
+        JobDataDto fistJobDataDto = new JobDataDto();
+        JobDataDto secondJobDataDto = new JobDataDto();
+        fistJobDataDto.setCreatedAt(1L);
+        secondJobDataDto.setCreatedAt(2L);
+        jobDataDtoList = new ArrayList<>();
+        jobDataDtoList.add(fistJobDataDto);
+        jobDataDtoList.add(secondJobDataDto);
+        ReflectionTestUtils.setField(defaultArbeitNowJsonProcessingService, "maxPageCount", 1);
     }
 
     @Test
     void shouldFetchDataAndSaveToDatabaseWhenInitMethodIsCalled() {
-        when(arbeitNowClient.fetchJobForPage(anyInt())).thenReturn(jobDataResponseList);
-        when(jobDataConverterService.convertJobDtoToJobDmoAndOrderByCreateDate(any(List.class))).thenReturn(jobDataDmoList);
+        when(arbeitNowClient.fetchJobsUntilPage(1)).thenReturn(jobDataDtoList);
+        when(jobDataConverterService.convertJobDtoToJobDmoAndOrderByCreateDate(anyList())).thenReturn(jobDataDmoList);
         when(jobDataDmoList.getFirst()).thenReturn(jobDataDmo);
         when(jobDataDmo.getCreatedAt()).thenReturn(CREATED_AT_TIMESTAMP);
         when(jobDataRepository.saveAll(jobDataDmoList)).thenReturn(jobDataDmoList);
-        ReflectionTestUtils.setField(defaultArbeitNowJsonProcessingService, "maxPageCount", 1);
 
         defaultArbeitNowJsonProcessingService.processInitialDataFetch();
 
-        Assertions.assertEquals(2, jobDataResponseList.size());
-        verify(arbeitNowClient).fetchJobForPage(anyInt());
-        verify(jobDataConverterService).convertJobDtoToJobDmoAndOrderByCreateDate(any(List.class));
+        Assertions.assertEquals(2, jobDataDtoList.size());
+        verify(arbeitNowClient).fetchJobsUntilPage(1);
+        verify(jobDataConverterService).convertJobDtoToJobDmoAndOrderByCreateDate(anyList());
         Assertions.assertEquals(CREATED_AT_TIMESTAMP, jobDataDmoList.getFirst().getCreatedAt());
         verify(jobDataRepository).saveAll(jobDataDmoList);
     }
 
     @Test
     void shouldNotSaveNewJobsWhenCreateTimeIsSameAsLastUpdateTime() {
-        when(arbeitNowClient.fetchJobForPage(anyInt())).thenReturn(jobDataResponseList);
+        when(arbeitNowClient.fetchJobForPage(anyInt())).thenReturn(jobDataDtoList);
         ReflectionTestUtils.setField(defaultArbeitNowJsonProcessingService, "lastUpdateTimeInEpoch", 2L);
-        ReflectionTestUtils.setField(defaultArbeitNowJsonProcessingService, "maxPageCount", 1);
 
         defaultArbeitNowJsonProcessingService.processNewJobsData();
 
