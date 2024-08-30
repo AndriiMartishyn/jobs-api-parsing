@@ -1,11 +1,11 @@
-package com.martishyn.jobsapi;
+package com.martishyn.jobsapi.domain.service.client;
 
 import com.martishyn.jobsapi.domain.client.ArbeitNowClient;
 import com.martishyn.jobsapi.domain.dmo.JobDataDmo;
 import com.martishyn.jobsapi.domain.dto.JobDataDto;
 import com.martishyn.jobsapi.domain.repository.JobDataRepository;
-import com.martishyn.jobsapi.domain.service.JobDataConverterService;
-import com.martishyn.jobsapi.domain.service.impl.DefaultArbeitNowJsonProcessingService;
+import com.martishyn.jobsapi.domain.service.converter.JobDataConverterService;
+import com.martishyn.jobsapi.domain.service.client.impl.DefaultArbeitNowJsonProcessingService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -64,7 +64,7 @@ public class DefaultArbeitNowJsonProcessingServiceTest {
     @Test
     void shouldFetchDataAndSaveToDatabaseWhenInitMethodIsCalled() {
         when(arbeitNowClient.fetchJobForPage(anyInt())).thenReturn(jobDataResponseList);
-        when(jobDataConverterService.convertResponseDataToDmoAndOrderByCreateDate(any(List.class))).thenReturn(jobDataDmoList);
+        when(jobDataConverterService.convertJobDtoToJobDmoAndOrderByCreateDate(any(List.class))).thenReturn(jobDataDmoList);
         when(jobDataDmoList.getFirst()).thenReturn(jobDataDmo);
         when(jobDataDmo.getCreatedAt()).thenReturn(CREATED_AT_TIMESTAMP);
         when(jobDataRepository.saveAll(jobDataDmoList)).thenReturn(jobDataDmoList);
@@ -74,7 +74,7 @@ public class DefaultArbeitNowJsonProcessingServiceTest {
 
         Assertions.assertEquals(2, jobDataResponseList.size());
         verify(arbeitNowClient).fetchJobForPage(anyInt());
-        verify(jobDataConverterService).convertResponseDataToDmoAndOrderByCreateDate(any(List.class));
+        verify(jobDataConverterService).convertJobDtoToJobDmoAndOrderByCreateDate(any(List.class));
         Assertions.assertEquals(CREATED_AT_TIMESTAMP, jobDataDmoList.getFirst().getCreatedAt());
         verify(jobDataRepository).saveAll(jobDataDmoList);
     }
@@ -88,7 +88,7 @@ public class DefaultArbeitNowJsonProcessingServiceTest {
         defaultArbeitNowJsonProcessingService.processNewJobsData();
 
         verify(arbeitNowClient).fetchJobForPage(anyInt());
-        verify(jobDataConverterService, never()).convertResponseDataToDmoAndOrderByCreateDate(any());
+        verify(jobDataConverterService, never()).convertJobDtoToJobDmoAndOrderByCreateDate(any());
         verify(jobDataRepository, never()).saveAll(any());
     }
 

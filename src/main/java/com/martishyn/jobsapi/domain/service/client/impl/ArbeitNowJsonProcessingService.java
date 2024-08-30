@@ -1,4 +1,4 @@
-package com.martishyn.jobsapi.domain.service;
+package com.martishyn.jobsapi.domain.service.client.impl;
 
 public interface ArbeitNowJsonProcessingService {
 

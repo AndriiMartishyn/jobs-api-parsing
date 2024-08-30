@@ -1,17 +1,15 @@
-package com.martishyn.jobsapi.domain.service.impl;
+package com.martishyn.jobsapi.domain.service.client.impl;
 
 import com.martishyn.jobsapi.domain.client.ArbeitNowClient;
 import com.martishyn.jobsapi.domain.dmo.JobDataDmo;
 import com.martishyn.jobsapi.domain.dto.JobDataDto;
 import com.martishyn.jobsapi.domain.repository.JobDataRepository;
-import com.martishyn.jobsapi.domain.service.ArbeitNowJsonProcessingService;
-import com.martishyn.jobsapi.domain.service.JobDataConverterService;
+import com.martishyn.jobsapi.domain.service.converter.JobDataConverterService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,7 +36,7 @@ public class DefaultArbeitNowJsonProcessingService implements ArbeitNowJsonProce
     @Override
     public void processInitialDataFetch() {
         List<JobDataDto> jobs = arbeitNowClient.fetchJobsUntilPage(maxPageCount);
-        List<JobDataDmo> jobDataDmos = jobDataConverterService.convertResponseDataToDmoAndOrderByCreateDate(jobs);
+        List<JobDataDmo> jobDataDmos = jobDataConverterService.convertJobDtoToJobDmoAndOrderByCreateDate(jobs);
         lastUpdateTimeInEpoch = jobDataDmos.getFirst().getCreatedAt();
         jobDataRepository.saveAll(jobDataDmos);
     }
@@ -56,7 +54,7 @@ public class DefaultArbeitNowJsonProcessingService implements ArbeitNowJsonProce
             updatedJobDataResponse.addAll(0, updatedJobData);
             if (!updatedJobData.isEmpty()) {
                 lastUpdateTimeInEpoch = updatedJobData.getFirst().getCreatedAt();
-                List<JobDataDmo> updatedJobDataDmo = jobDataConverterService.convertResponseDataToDmoAndOrderByCreateDate(updatedJobDataResponse);
+                List<JobDataDmo> updatedJobDataDmo = jobDataConverterService.convertJobDtoToJobDmoAndOrderByCreateDate(updatedJobDataResponse);
                 jobDataRepository.saveAll(updatedJobDataDmo);
                 pageCounter++;
             } else {

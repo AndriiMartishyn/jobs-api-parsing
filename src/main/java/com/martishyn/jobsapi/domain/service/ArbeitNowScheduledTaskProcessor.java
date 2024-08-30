@@ -1,6 +1,6 @@
-package com.martishyn.jobsapi.domain.service.schedule;
+package com.martishyn.jobsapi.domain.service;
 
-import com.martishyn.jobsapi.domain.service.ArbeitNowJsonProcessingService;
+import com.martishyn.jobsapi.domain.service.client.impl.ArbeitNowJsonProcessingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
