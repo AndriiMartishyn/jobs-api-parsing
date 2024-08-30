@@ -1,11 +1,8 @@
 package com.martishyn.jobsapi.domain.dmo;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import jdk.jfr.Enabled;
 import lombok.*;
 
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -19,19 +16,28 @@ public class JobDataDmo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "slug_name")
     private String slugName;
+
     @Column(name = "company_name")
     private String companyName;
+
     private String title;
-    @Column(length=10485760)
+
+    @Column(length = 10485760)
     private String description;
+
     private String remote;
+
     private String url;
+
     private String tags;
+
     private String jobTypes;
+
     private String location;
-    @OrderColumn
+
     private long createdAt;
 
     @Override

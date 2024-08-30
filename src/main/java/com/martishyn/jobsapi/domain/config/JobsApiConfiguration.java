@@ -11,4 +11,5 @@ public class JobsApiConfiguration {
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
+
 }

@@ -1,28 +1,31 @@
-package com.martishyn.jobsapi.domain.service.impl;
+package com.martishyn.jobsapi.domain.service.client.impl;
 
 import com.martishyn.jobsapi.domain.client.ArbeitNowClient;
 import com.martishyn.jobsapi.domain.dmo.JobDataDmo;
+import com.martishyn.jobsapi.domain.dto.JobDataDto;
 import com.martishyn.jobsapi.domain.repository.JobDataRepository;
-import com.martishyn.jobsapi.domain.response.JobDataResponse;
-import com.martishyn.jobsapi.domain.service.ArbeitNowJsonProcessingService;
-import com.martishyn.jobsapi.domain.service.JobDataConverterService;
+import com.martishyn.jobsapi.domain.service.converter.JobDataConverterService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.LinkedList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class DefaultArbeitNowJsonProcessingService implements ArbeitNowJsonProcessingService {
 
     private final ArbeitNowClient arbeitNowClient;
+
     private final JobDataConverterService jobDataConverterService;
+
     private final JobDataRepository jobDataRepository;
+
     @Value("${jobs.api.client.max.page.count}")
     private int maxPageCount;
+
     private long lastUpdateTimeInEpoch;
 
     @PostConstruct
@@ -32,34 +35,30 @@ public class DefaultArbeitNowJsonProcessingService implements ArbeitNowJsonProce
 
     @Override
     public void processInitialDataFetch() {
-        List<JobDataResponse> fetchedJobsData = new ArrayList<>();
-        for (int i = 1; i <= maxPageCount; i++) {
-            List<JobDataResponse> jobDataResponses = arbeitNowClient.fetchApiData(i);
-            fetchedJobsData.addAll(jobDataResponses);
-        }
-        List<JobDataDmo> jobDataDmos = jobDataConverterService.convertResponseDataToDmoAndOrderByCreateDate(fetchedJobsData);
+        List<JobDataDto> jobs = arbeitNowClient.fetchJobsUntilPage(maxPageCount);
+        List<JobDataDmo> jobDataDmos = jobDataConverterService.convertJobDtoToJobDmoAndOrderByCreateDate(jobs);
         lastUpdateTimeInEpoch = jobDataDmos.getFirst().getCreatedAt();
         jobDataRepository.saveAll(jobDataDmos);
     }
 
     @Override
     public void processNewJobsData() {
-        List<JobDataResponse> updatedJobDataResponse = new ArrayList<>();
+        boolean hasNewJobs = true;
         int pageCounter = 1;
-        boolean hasMorePage = true;
-        while (hasMorePage) {
-            List<JobDataResponse> jobDataResponses = arbeitNowClient.fetchApiData(pageCounter);
-            List<JobDataResponse> updatedJobData = jobDataResponses.stream()
+        List<JobDataDto> updatedJobDataResponse = new LinkedList<>();
+        while (hasNewJobs) {
+            List<JobDataDto> updatedJobData = arbeitNowClient.fetchJobForPage(pageCounter)
+                    .stream()
                     .filter(job -> job.getCreatedAt() > lastUpdateTimeInEpoch)
                     .toList();
             updatedJobDataResponse.addAll(0, updatedJobData);
             if (!updatedJobData.isEmpty()) {
                 lastUpdateTimeInEpoch = updatedJobData.getFirst().getCreatedAt();
-                List<JobDataDmo> updatedJobDataDmo = jobDataConverterService.convertResponseDataToDmoAndOrderByCreateDate(updatedJobDataResponse);
-                jobDataRepository.saveAll( updatedJobDataDmo);
+                List<JobDataDmo> updatedJobDataDmo = jobDataConverterService.convertJobDtoToJobDmoAndOrderByCreateDate(updatedJobDataResponse);
+                jobDataRepository.saveAll(updatedJobDataDmo);
                 pageCounter++;
             } else {
-                hasMorePage = false;
+                hasNewJobs = false;
             }
         }
     }

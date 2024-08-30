@@ -1,11 +1,13 @@
 package com.martishyn.jobsapi.domain.client;
 
-import com.martishyn.jobsapi.domain.response.JobDataResponse;
-import com.martishyn.jobsapi.domain.response.JobsApiResponse;
+import com.martishyn.jobsapi.domain.dto.JobDataDto;
 
 import java.util.List;
 
 public interface ArbeitNowClient {
 
-    List<JobDataResponse> fetchApiData(int currentPage);
+    List<JobDataDto> fetchJobForPage(int currentPage);
+
+    List<JobDataDto> fetchJobsUntilPage(int maxPage);
+
 }
