@@ -25,7 +25,7 @@ public class DefaultArtbeitNowClient implements ArbeitNowClient {
     @Override
     public List<JobDataDto> fetchJobForPage(int currentPage) {
         String url = ARBEIT_NOW_BASE_URL + PAGE_PARAM + currentPage;
-        return Objects.requireNonNull(restTemplate.getForObject(url + currentPage, JobsWrapperDataDto.class)).getJobsData();
+        return Objects.requireNonNull(restTemplate.getForObject(url, JobsWrapperDataDto.class)).getJobsData();
     }
 
     @Override
