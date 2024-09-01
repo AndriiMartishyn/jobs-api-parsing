@@ -24,7 +24,7 @@ public class JobsApiController {
     @GetMapping
     public ResponseEntity<List<JobDataDto>> getAllJobsSortedAndOrdered(@RequestParam(defaultValue = "1") int currentPage,
                                                                        @RequestParam(defaultValue = "100") int pageSize,
-                                                                       @RequestParam(value = "sortBy", defaultValue = "createdAt, asc") String[] sortingParams) {
+                                                                       @RequestParam(value = "sortBy", defaultValue = "createdAt, desc") String[] sortingParams) {
         String field = sortingParams[0];
         String sortingDirection = sortingParams[1];
         Sort.Direction direction = sortingDirection.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
