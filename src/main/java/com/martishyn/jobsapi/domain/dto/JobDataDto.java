@@ -1,18 +1,19 @@
 package com.martishyn.jobsapi.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.martishyn.jobsapi.domain.representationmodel.RepresentationModel;
+import lombok.*;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobDataDto {
+@JsonPropertyOrder({"slugName", "companyName", "title", "description", "remote", "url", "tags", "jobTypes", "location", "createdAt", "_links"})
+public class JobDataDto extends RepresentationModel {
 
     @JsonProperty("slug")
     private String slugName;

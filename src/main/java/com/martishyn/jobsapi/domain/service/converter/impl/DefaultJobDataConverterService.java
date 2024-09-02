@@ -2,6 +2,7 @@ package com.martishyn.jobsapi.domain.service.converter.impl;
 
 import com.martishyn.jobsapi.domain.dmo.JobDataDmo;
 import com.martishyn.jobsapi.domain.dto.JobDataDto;
+import com.martishyn.jobsapi.domain.representationmodel.Link;
 import com.martishyn.jobsapi.domain.service.converter.JobDataConverterService;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +40,7 @@ public class DefaultJobDataConverterService implements JobDataConverterService {
 
     @Override
     public JobDataDto convertJobDmoToJobDto(JobDataDmo jobDataDmo) {
-        return JobDataDto.builder()
+        JobDataDto convertedDto = JobDataDto.builder()
                 .slugName(jobDataDmo.getSlugName())
                 .companyName(jobDataDmo.getCompanyName())
                 .title(jobDataDmo.getTitle())
@@ -51,6 +52,7 @@ public class DefaultJobDataConverterService implements JobDataConverterService {
                 .location(jobDataDmo.getLocation())
                 .createdAt(jobDataDmo.getCreatedAt())
                 .build();
+        convertedDto.setLinks(Collections.singletonList(new Link(convertedDto.getUrl())));
+        return convertedDto;
     }
-
 }

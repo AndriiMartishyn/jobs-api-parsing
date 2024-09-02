@@ -10,4 +10,5 @@ public class JobsWrapperDataDto {
 
     @JsonProperty(value = "data")
     List<JobDataDto> jobsData;
+
 }
