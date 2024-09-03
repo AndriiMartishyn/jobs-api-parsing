@@ -47,5 +47,5 @@ http://localhost:8080/swagger-ui/index.htm
 Project also runs on AWS EC2 Instance
 
 ```shell
-//to write host name
+ec2-18-193-71-244.eu-central-1.compute.amazonaws.com:8080
 ```
