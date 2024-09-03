@@ -6,10 +6,7 @@ import com.martishyn.jobsapi.domain.dto.JobDataDto;
 import com.martishyn.jobsapi.domain.repository.JobDataRepository;
 import com.martishyn.jobsapi.domain.service.client.impl.DefaultArbeitNowJsonProcessingService;
 import com.martishyn.jobsapi.domain.service.converter.JobDataConverterService;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -41,6 +38,7 @@ public class DefaultArbeitNowJsonProcessingServiceTest {
     @Mock
     private JobDataRepository jobDataRepository;
 
+    @Spy
     private List<JobDataDto> jobDataDtoList;
 
     @Mock
@@ -58,12 +56,13 @@ public class DefaultArbeitNowJsonProcessingServiceTest {
         jobDataDtoList = new ArrayList<>();
         jobDataDtoList.add(fistJobDataDto);
         jobDataDtoList.add(secondJobDataDto);
-        ReflectionTestUtils.setField(defaultArbeitNowJsonProcessingService, "maxPageCount", 1);
     }
 
-    @Test
+    @DisplayName("should-process-init-data")
+    @Test //works only alone
     void shouldFetchDataAndSaveToDatabaseWhenInitMethodIsCalled() {
-        when(arbeitNowClient.fetchJobsUntilPage(1)).thenReturn(jobDataDtoList);
+        ReflectionTestUtils.setField(defaultArbeitNowJsonProcessingService, "maxPageCount", 1);
+        when(arbeitNowClient.fetchJobsUntilPage(anyInt())).thenReturn(jobDataDtoList);
         when(jobDataConverterService.convertJobDtoToJobDmoAndOrderByCreateDate(anyList())).thenReturn(jobDataDmoList);
         when(jobDataDmoList.getFirst()).thenReturn(jobDataDmo);
         when(jobDataDmo.getCreatedAt()).thenReturn(CREATED_AT_TIMESTAMP);
@@ -78,6 +77,7 @@ public class DefaultArbeitNowJsonProcessingServiceTest {
         verify(jobDataRepository).saveAll(jobDataDmoList);
     }
 
+    @DisplayName("should-not-process-when-same-last-update-time")
     @Test
     void shouldNotSaveNewJobsWhenCreateTimeIsSameAsLastUpdateTime() {
         when(arbeitNowClient.fetchJobForPage(anyInt())).thenReturn(jobDataDtoList);

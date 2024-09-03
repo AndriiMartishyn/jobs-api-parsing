@@ -72,10 +72,10 @@ public class JobsApiControllerTest {
         ResultActions result = mockMvc.perform(get(RESOURCE_ENDPOINT + "?currentPage=1&pageSize=1&sortBy=title,asc"));
 
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].title").value(jobDataDtoList.get(0).getTitle()))
-                .andExpect(jsonPath("$.[0].created_at").value(jobDataDtoList.get(0).getCreatedAt()))
-                .andExpect(jsonPath("$.[1].title").value(jobDataDtoList.get(1).getTitle()))
-                .andExpect(jsonPath("$.[1].created_at").value(jobDataDtoList.get(1).getCreatedAt()))
+                .andExpect(jsonPath("$.['data'].[0].title").value(jobDataDtoList.get(0).getTitle()))
+                .andExpect(jsonPath("$.['data'].[0].created_at").value(jobDataDtoList.get(0).getCreatedAt()))
+                .andExpect(jsonPath("$.['data'].[1].title").value(jobDataDtoList.get(1).getTitle()))
+                .andExpect(jsonPath("$.['data'].[1].created_at").value(jobDataDtoList.get(1).getCreatedAt()))
                 .andDo(print());
 
         verify(jobsRestService).findJobsPaginatedAndSorted(pageRequestWithTitleSort);
@@ -88,10 +88,10 @@ public class JobsApiControllerTest {
         ResultActions result = mockMvc.perform(get(RESOURCE_ENDPOINT + "?currentPage=1&pageSize=1&sortBy=createdAt,desc"));
 
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].title").value(jobDataDtoList.get(1).getTitle()))
-                .andExpect(jsonPath("$.[0].created_at").value(jobDataDtoList.get(1).getCreatedAt()))
-                .andExpect(jsonPath("$.[1].title").value(jobDataDtoList.get(0).getTitle()))
-                .andExpect(jsonPath("$.[1].created_at").value(jobDataDtoList.get(0).getCreatedAt()))
+                .andExpect(jsonPath("$.['data'].[0].title").value(jobDataDtoList.get(1).getTitle()))
+                .andExpect(jsonPath("$.['data'].[0].created_at").value(jobDataDtoList.get(1).getCreatedAt()))
+                .andExpect(jsonPath("$.['data'].[1].title").value(jobDataDtoList.get(0).getTitle()))
+                .andExpect(jsonPath("$.['data'].[1].created_at").value(jobDataDtoList.get(0).getCreatedAt()))
                 .andDo(print());
 
         verify(jobsRestService).findJobsPaginatedAndSorted(pageRequestWithCreatedAtSort);
@@ -104,10 +104,10 @@ public class JobsApiControllerTest {
         ResultActions result = mockMvc.perform(get(RESOURCE_ENDPOINT + RECENT_JOBS_ENDPOINT));
 
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].title").value(jobDataDtoList.get(0).getTitle()))
-                .andExpect(jsonPath("$.[0].created_at").value(jobDataDtoList.get(0).getCreatedAt()))
-                .andExpect(jsonPath("$.[1].title").value(jobDataDtoList.get(1).getTitle()))
-                .andExpect(jsonPath("$.[1].created_at").value(jobDataDtoList.get(1).getCreatedAt()))
+                .andExpect(jsonPath("$.['data'].[0].title").value(jobDataDtoList.get(0).getTitle()))
+                .andExpect(jsonPath("$.['data'].[0].created_at").value(jobDataDtoList.get(0).getCreatedAt()))
+                .andExpect(jsonPath("$.['data'].[1].title").value(jobDataDtoList.get(1).getTitle()))
+                .andExpect(jsonPath("$.['data'].[1].created_at").value(jobDataDtoList.get(1).getCreatedAt()))
                 .andDo(print());
 
         verify(jobsRestService).findMostRecentJobs(simplePageRequestWithSize);
